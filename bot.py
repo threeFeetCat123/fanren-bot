@@ -9,8 +9,8 @@
 每一年的修炼仍由游戏自身 rollYear() 真实随机模拟。
 
 ⚠️ 成仙拉满补丁（configure 第 5 步，默认开启）：包一层 window.Sim.rollYear，渡劫前
-把修为顶到 ≥50w（原规则此区间 100% 成功）、成仙后最终修为 ×1000。这会让凡是能撑到
-渡劫时刻的局都成仙，并大幅抬高成仙修为 —— 会真实累加成仙次数 / 最高修为到 B 站榜与
+把修为顶到 ≥50w（原规则此区间 100% 成功）、成仙后最终修为 ×1000000。这会让凡是能撑到
+渡劫时刻的局都成仙，并大幅抬高成仙修为（成仙修为约 2 万亿量级）—— 会真实累加成仙次数 / 最高修为到 B 站榜与
 成就，属有意放大结算数值，非原版正常结算。不需要时删掉 configure 的第 5 步即可。
 其余不修改任何存档数据。
 
@@ -193,7 +193,8 @@ async def configure(frame) -> dict:
       document.head.appendChild(style);
       // 5) 拉满成仙：包一层引擎 rollYear。game.js 每帧经 window.Sim.rollYear 驱动一局每一
       //    年，包在这里即可拦截所有真实刷局。渡劫时刻前把修为顶到 ≥50w（原规则此区间渡劫
-      //    必成），成仙后再把最终修为 ×1000 放大（修为增幅拉满）。只在首次包裹时生效。
+      //    必成），成仙后再把最终修为 ×1000000 放大（修为增幅拉满 ≈2 万亿；想再拉高/调低
+      //    只改下面 ASC_MULT 这一处）。只在首次包裹时生效。
       let ascBoosted = false;
       try {
         const S = window.Sim;
@@ -207,7 +208,8 @@ async def configure(frame) -> dict:
             const res = origRoll(g, log);
             if (g && g.ascended && g.lvl === 101 && !g.__frAscOnce) {
               g.__frAscOnce = true;
-              g.cult = Math.round(g.cult * 1000);   /* 修为增幅拉满 ×1000 */
+              const ASC_MULT = 1000000;   /* 修为增幅拉满：渡劫后最终修为 ×1000000 */
+              g.cult = Math.round(g.cult * ASC_MULT);
             }
             return res;
           };
